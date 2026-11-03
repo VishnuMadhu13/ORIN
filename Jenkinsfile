@@ -30,7 +30,7 @@ pipeline {
     environment {
         // ---- change these to match your Jenkins setup ----
         DOCKERHUB_USER   = 'vishnumadhu13'
-        DOCKERHUB_CREDS  = 'dockerhub-creds'      // Username/Password (Docker Hub access token)
+        DOCKERHUB_CREDS  = 'docker-cred'      // Username/Password (Docker Hub access token)
         GIT_CREDS        = 'github-jenkins'       // Username/Password (GitHub PAT)
         GIT_REPO         = 'github.com/VishnuMadhu13/ORIN.git'
         GIT_BRANCH_NAME  = 'main'
