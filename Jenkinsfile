@@ -42,7 +42,7 @@ pipeline {
         IMAGE_TAG    = "${BUILD_NUMBER}"
         REPORTS      = 'reports'
         DAST_NET     = "orin-dast-${BUILD_NUMBER}"
-        NODE_IMAGE   = 'node:20.18.1-alpine'
+        NODE_IMAGE   = 'node:22.14.0-alpine'
         TRIVY_IMAGE  = 'aquasec/trivy:0.58.1'
         ZAP_IMAGE    = 'ghcr.io/zaproxy/zaproxy:2.15.0'
         CURL_IMAGE   = 'curlimages/curl:8.11.1'
