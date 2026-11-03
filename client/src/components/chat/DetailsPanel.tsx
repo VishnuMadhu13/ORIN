@@ -7,11 +7,14 @@ import { useChat } from "@/store/chat";
 import { useUi } from "@/store/ui";
 import { conversationTitle } from "@/utils/format";
 
+import type { ChatMessage } from "@/types";
+const EMPTY_MESSAGES: ChatMessage[] = [];
+
 export function DetailsPanel() {
   const open = useUi((s) => s.detailsOpen);
   const setDetails = useUi((s) => s.setDetails);
   const conversation = useChat((s) => s.conversations.find((c) => c.id === s.activeId));
-  const messages = useChat((s) => (s.activeId ? s.messages[s.activeId] : []) ?? []);
+  const messages = useChat((s) => (s.activeId ? s.messages[s.activeId] : undefined) ?? EMPTY_MESSAGES);
   const me = useAuth((s) => s.user);
   const archive = useChat((s) => s.archive);
   const [name, setName] = useState(conversation?.name ?? "");

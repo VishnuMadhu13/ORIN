@@ -9,10 +9,13 @@ import { Composer } from "./Composer";
 import { MessageBubble } from "./MessageBubble";
 import { api } from "@/services/api";
 
+import type { ChatMessage } from "@/types";
+const EMPTY_MESSAGES: ChatMessage[] = [];
+
 export function ChatWindow() {
   const activeId = useChat((s) => s.activeId);
   const conversations = useChat((s) => s.conversations);
-  const messages = useChat((s) => (activeId ? s.messages[activeId] : []) ?? []);
+  const messages = useChat((s) => (activeId ? s.messages[activeId] : undefined) ?? EMPTY_MESSAGES);
   const loading = useChat((s) => s.loadingMessages);
   const typingMap = useChat((s) => s.typing);
   const me = useAuth((s) => s.user);

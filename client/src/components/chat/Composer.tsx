@@ -4,6 +4,9 @@ import { getSocket } from "@/services/socket";
 import { useChat } from "@/store/chat";
 import { EmojiPicker } from "./EmojiPicker";
 
+import type { ChatMessage } from "@/types";
+const EMPTY_MESSAGES: ChatMessage[] = [];
+
 export function Composer({ replyTo, onCancelReply }: { replyTo: string | null; onCancelReply: () => void }) {
   const [text, setText] = useState("");
   const [emoji, setEmoji] = useState(false);
@@ -13,7 +16,7 @@ export function Composer({ replyTo, onCancelReply }: { replyTo: string | null; o
   const sendText = useChat((s) => s.sendText);
   const sendFile = useChat((s) => s.sendFile);
   const activeId = useChat((s) => s.activeId);
-  const messages = useChat((s) => (activeId ? s.messages[activeId] : []) ?? []);
+  const messages = useChat((s) => (activeId ? s.messages[activeId] : undefined) ?? EMPTY_MESSAGES);
   const reply = messages.find((m) => m.id === replyTo);
 
   function emitTyping(on: boolean) {

@@ -46,6 +46,7 @@ export function SettingsPage() {
   }
 
   async function savePrefs() {
+    if (!user) return;
     const { data } = await api.patch("/settings", {
       privacy: user.privacy,
       notifications: user.notifications,
