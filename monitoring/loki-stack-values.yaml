@@ -1,0 +1,21 @@
+# Centralised logging: Loki + Promtail (ships every pod's stdout/stderr)
+# helm upgrade --install loki grafana/loki-stack -n logging --create-namespace \
+#   -f monitoring/loki-stack-values.yaml
+loki:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 5Gi
+  config:
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 168h   # 7 days
+
+promtail:
+  enabled: true
+
+# Grafana comes from kube-prometheus-stack
+grafana:
+  enabled: false
+prometheus:
+  enabled: false

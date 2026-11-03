@@ -1,0 +1,62 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: orin-alerts
+  namespace: orin
+  labels:
+    app.kubernetes.io/part-of: orin
+spec:
+  groups:
+    - name: orin.kubernetes
+      rules:
+        - alert: OrinPodRestarting
+          expr: increase(kube_pod_container_status_restarts_total{namespace="orin"}[15m]) > 3
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: "{{ $labels.pod }} restarted more than 3 times in 15m"
+        - alert: OrinPodNotReady
+          expr: kube_pod_status_ready{namespace="orin", condition="false"} == 1
+          for: 5m
+          labels: { severity: critical }
+          annotations:
+            summary: "{{ $labels.pod }} has been NotReady for 5m"
+        - alert: OrinHighMemory
+          expr: |
+            sum by (pod) (container_memory_working_set_bytes{namespace="orin", container!=""})
+              / sum by (pod) (kube_pod_container_resource_limits{namespace="orin", resource="memory"}) > 0.9
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: "{{ $labels.pod }} is above 90% of its memory limit"
+        - alert: OrinVolumeAlmostFull
+          expr: |
+            kubelet_volume_stats_available_bytes{namespace="orin"}
+              / kubelet_volume_stats_capacity_bytes{namespace="orin"} < 0.1
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: "PVC {{ $labels.persistentvolumeclaim }} has less than 10% free"
+    - name: orin.application
+      rules:
+        - alert: OrinApiDown
+          expr: up{job="orin-server"} == 0
+          for: 2m
+          labels: { severity: critical }
+          annotations:
+            summary: "ORIN API /metrics target is down"
+        - alert: OrinHigh5xxRate
+          expr: |
+            sum(rate(orin_http_requests_total{status=~"5.."}[5m]))
+              / clamp_min(sum(rate(orin_http_requests_total[5m])), 1e-9) > 0.05
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: "More than 5% of ORIN API requests return 5xx"
+        - alert: OrinSlowApi
+          expr: |
+            histogram_quantile(0.95, sum by (le) (rate(orin_http_request_duration_seconds_bucket[5m]))) > 1
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: "ORIN API p95 latency above 1s"

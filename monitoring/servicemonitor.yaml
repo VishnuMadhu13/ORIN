@@ -1,0 +1,19 @@
+# Scrapes the API's /metrics endpoint (requires monitoring/metrics.ts wired into the server).
+# Apply after kube-prometheus-stack is installed (it provides the CRD).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: orin-server
+  namespace: orin
+  labels:
+    app.kubernetes.io/part-of: orin
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orin-server
+  namespaceSelector:
+    matchNames: ["orin"]
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

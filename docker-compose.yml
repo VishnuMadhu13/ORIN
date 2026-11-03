@@ -1,0 +1,41 @@
+# Local container test: docker compose up --build  ->  http://localhost:8088
+# Port 5000 is NOT published (macOS AirPlay uses it); nginx proxies to the API.
+services:
+  mongo:
+    image: mongo:6.0
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  orin-server:
+    build: ./server
+    image: vishnumadhu13/orin-server:local
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      MONGODB_URI: mongodb://mongo:27017/orin
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in the root .env}
+      CLIENT_URL: http://localhost:8088
+      COOKIE_SECURE: "false"
+      MAX_UPLOAD_MB: "25"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  orin-client:
+    build: ./client
+    image: vishnumadhu13/orin-client:local
+    ports:
+      - "8088:8080"
+    depends_on:
+      - orin-server
+
+volumes:
+  mongo-data:
+  uploads:

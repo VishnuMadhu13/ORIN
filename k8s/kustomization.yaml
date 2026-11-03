@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: orin
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - mongo.yaml
+  - server.yaml
+  - client.yaml
+
+# Jenkins rewrites newTag on every successful build (GitOps)
+images:
+  - name: vishnumadhu13/orin-server
+    newTag: "latest"
+  - name: vishnumadhu13/orin-client
+    newTag: "latest"
